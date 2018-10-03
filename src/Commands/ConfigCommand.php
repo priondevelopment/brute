@@ -1,6 +1,6 @@
 <?php
 
-namespace Setting\Commands;
+namespace Brute\Commands;
 
 /**
  * This file is part of Seetting,
