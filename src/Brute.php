@@ -19,6 +19,11 @@ class Brute
      */
     public $app;
 
+    protected $methods = [
+        'attempt' => Attempt::class,
+        'block' => Block::class,
+    ];
+
     /**
      * Create a new confide instance.
      *
@@ -30,4 +35,15 @@ class Brute
         $this->app = $app;
     }
 
+
+    /**
+     * Load Brute Classes
+     *
+     *
+     */
+    public function get($method)
+    {
+        $method = strtolower($method);
+        return new $this->methods[$method];
+    }
 }

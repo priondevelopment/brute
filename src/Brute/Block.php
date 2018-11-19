@@ -2,9 +2,9 @@
 
 namespace Brute;
 
-use Attempt;
+use \Brute\Attempt;
 
-class Block implements Brute\Contacts\BruteInterface
+class Block extends BruteBase
 {
 
     public $type = 'brute_block:';
@@ -18,16 +18,14 @@ class Block implements Brute\Contacts\BruteInterface
      */
     public function check($key)
     {
-        $key = $this->type . $key;
-        $key = $this->key($key);
-        $key = $this->keyFilter($key);
+        $key = $this->filterKey($key);
+        $check = $this->cache()->has($key);
 
-        $check = $this->cache()->get($key);
-
-        if ($check >= 1)
+        if (!$check) {
             return true;
+        }
 
-        return false;
+        app()->make('error')->code(2050);
     }
 
 
@@ -36,13 +34,16 @@ class Block implements Brute\Contacts\BruteInterface
      *
      * @param $key
      */
-    public function set($key, $maxAttempts='')
+    public function attempt($key, $maxAttempts='')
     {
-        $attempts = (new Attempt)->get($key);
-        $maxAttempts = $maxAttempts ?: config('prionbrute.block.attempts');
+        $attempts = (new Attempt)
+            ->reset($this->prefix, $this->item)
+            ->add($key);
+        $maxAttempts = $maxAttempts ?: config('prionbrute.attempts');
 
-        if ($attempts >= $maxAttempts)
+        if ($attempts >= $maxAttempts) {
             return $this->block($key);
+        }
 
         return false;
     }
